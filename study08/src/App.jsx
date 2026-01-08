@@ -1,7 +1,7 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { BrowserRouter, Routes, Route } from "react-router";
-import "@/list.css"
+import "@/style.css"
 
 const Nav = () => {
   return (
@@ -14,22 +14,28 @@ const Nav = () => {
         <div className="collapse navbar-collapse" id="collapsibleNavbar">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <a className="nav-link" href="/new">Create</a>
+              <a className="nav-link" href="/signIn">SignIn</a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="/detail">Detail</a>
+              <a className="nav-link" href="/signUp">SignUp</a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="/user">User</a>
             </li>
             <li className="nav-item">
               <a className="nav-link" href="/404">404</a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="/html/list.html" target="_blank">예시화면1</a>
+              <a className="nav-link" href="/html/main.html" target="_blank">예시화면1</a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="/html/create.html" target="_blank">예시화면2</a>
+              <a className="nav-link" href="/html/signIn.html" target="_blank">예시화면2</a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="/html/detail.html" target="_blank">예시화면3</a>
+              <a className="nav-link" href="/html/signUp.html" target="_blank">예시화면3</a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="/html/user.html" target="_blank">예시화면4</a>
             </li>
           </ul>
         </div>
@@ -45,19 +51,24 @@ const Footer = () => {
     </div>
   )
 }
-const List = () => {
+const Main = () => {
   return (
-    <h1 className="text-center">목록 화면</h1>
+    <h1 className="text-center">기본 화면</h1>
   )
 }
-const Create = () => {
+const SignIn = () => {
   return (
-    <h1 className="text-center">생성 화면</h1>
+    <h1 className="text-center">로그인 화면</h1>
   )
 }
-const Detail = () => {
+const SignUp = () => {
   return (
-    <h1 className="text-center">상세 화면</h1>
+    <h1 className="text-center">회원가입 화면</h1>
+  )
+}
+const User = () => {
+  return (
+    <h1 className="text-center">사용자 정보 화면</h1>
   )
 }
 const NotFound = () => {
@@ -70,9 +81,10 @@ const NotFound = () => {
 }
 const App = () => {
   const paths = [
-    {path: "/", element: <List />},
-    {path: "/new", element: <Create />},
-    {path: "/detail", element: <Detail />},
+    {path: "/", element: <Main />},
+    {path: "/signIn", element: <SignIn />},
+    {path: "/signUp", element: <SignUp />},
+    {path: "/user", element: <User />},
     {path: "*", element: <NotFound />},
   ]
   return (
