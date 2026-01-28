@@ -1,5 +1,4 @@
-import { useContext } from 'react'
-import { AuthContext } from '@hooks/AuthContext.js'
+import { useAuth } from '@hooks/AuthProvider.jsx'
 import axios from "axios"
 
 const api = axios.create({
@@ -11,7 +10,7 @@ const api = axios.create({
 })
 
 const Login = () => {
-  const auth = useContext(AuthContext)
+  const { setAuth } = useAuth()
   const submitEvent = e => {
     e.preventDefault()
 
@@ -22,7 +21,7 @@ const Login = () => {
     api.post("/login", params)
     .then(res => {
       console.log(res)
-      auth.setIsLogin(res.data.status)
+      setAuth(res.data.status)
     })
     .catch(err => console.error(err))
 

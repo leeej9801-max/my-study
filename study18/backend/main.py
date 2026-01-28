@@ -38,6 +38,11 @@ def login(loginModel: LoginModel, response: Response):
   )
   return {"status": True, "model": loginModel}
 
+@app.post("/logout")
+def logout(response: Response):
+  response.delete_cookie(key="user")
+  return {"status": True}
+
 @app.get("/user")
 def user(request: Request):
   email = request.cookies.get("user")

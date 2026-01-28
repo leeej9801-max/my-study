@@ -1,8 +1,7 @@
-import { useContext } from 'react'
-import { AuthContext } from '@hooks/AuthContext.js'
+import { useAuth } from '@hooks/AuthProvider.jsx'
 
 const Nav = () => {
-  const auth = useContext(AuthContext)
+  const { isLogin, removeAuth } = useAuth()
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
 			<div className="container-fluid">
@@ -13,23 +12,28 @@ const Nav = () => {
 				<div className="collapse navbar-collapse" id="navbarNav">
 					<ul className="navbar-nav" me-auto="true">
             {
-              !auth.isLogin && 
+              !isLogin && 
+              <>
               <li className="nav-item">
                 <a className="nav-link" href="/login">로그인</a>
               </li>
+              <li className="nav-item">
+                <a className="nav-link" href="#">회원가입</a>
+              </li>
+              </>
             }
             {
-              auth.isLogin && 
-              <li className="nav-item">
-                <a className="nav-link" href="#">로그아웃</a>
-              </li>
+              isLogin && 
+              <>
+                <li className="nav-item">
+                  <button className="nav-link" onClick={()=>removeAuth()}>로그아웃</button>
+                </li>
+                <li className="nav-item">
+                  <a className="nav-link" href="#">회원정보</a>
+                </li>
+              </>
             }
-						<li className="nav-item">
-							<a className="nav-link" href="#">회원가입</a>
-						</li>
-						<li className="nav-item">
-							<a className="nav-link" href="#">회원정보</a>
-						</li>
+						
 					</ul>
 				</div>
 			</div>
