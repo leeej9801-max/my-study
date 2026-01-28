@@ -1,3 +1,5 @@
+import { useContext } from 'react'
+import { AuthContext } from '@hooks/AuthContext.js'
 import axios from "axios"
 
 const api = axios.create({
@@ -9,6 +11,7 @@ const api = axios.create({
 })
 
 const Login = () => {
+  const auth = useContext(AuthContext)
   const submitEvent = e => {
     e.preventDefault()
 
@@ -16,19 +19,24 @@ const Login = () => {
       "email": e.target.email.value,
       "pwd": e.target.pwd.value
     } 
-    api.post("http://localhost:8000/login", params)
-    .then(res => console.log(res))
+    api.post("/login", params)
+    .then(res => {
+      console.log(res)
+      auth.setIsLogin(res.data.status)
+    })
     .catch(err => console.error(err))
 
   }
   const checkEvent = () => {
 
-    api.get("http://localhost:8000/user")
+    api.get("/user")
     .then(res => console.log(res))
     .catch(err => console.error(err))
 
   }
   return (
+    <>
+    
     <div className="container mt-3">
 			<h1 className="display-1 text-center">로그인</h1>
 			<form onSubmit={submitEvent}>
@@ -50,6 +58,7 @@ const Login = () => {
         </div>
 			</form>
 		</div>
+    </>
   )
 }
 
