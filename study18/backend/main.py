@@ -1,6 +1,5 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.sessions import SessionMiddleware
 from pydantic import BaseModel
 
 origins = [
@@ -19,27 +18,29 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.add_middleware(
-    SessionMiddleware, 
-    secret_key="your-long-random-secret-key",
-    # Optional parameters:
-    same_site="none",
-    https_only=False,
-    max_age=3600, # (1 hour)
-)
 
 @app.get("/")
 def read_root():
   return {"status": True, "result": ["공유는 해드림"]}
 
 @app.post("/login")
-def login(loginModel: LoginModel, request: Request):
-  request.session["email"] = loginModel.email
+def login(loginModel: LoginModel, response: Response):
+  response.set_cookie(
+    key="user",
+    value=loginModel.email,
+    max_age=60 * 60,        # 1시간 (초)
+    expires=60 * 60,        # max_age와 유사 (초)
+    path="/",
+    domain="localhost",
+    secure=True,            # HTTPS에서만 전송
+    httponly=True,          # JS 접근 차단 (⭐ 보안 중요)
+    samesite="lax",         # 'lax' | 'strict' | 'none'
+  )
   return {"status": True, "model": loginModel}
 
 @app.get("/user")
 def user(request: Request):
-  email = request.session.get("email")
+  email = request.cookies.get("user")
   if email:
     return {"status": True, "me": email}
   else:

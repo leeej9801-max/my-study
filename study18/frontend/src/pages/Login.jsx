@@ -1,5 +1,13 @@
 import axios from "axios"
 
+const api = axios.create({
+  baseURL: "http://localhost:8000",
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
+})
+
 const Login = () => {
   const submitEvent = e => {
     e.preventDefault()
@@ -8,14 +16,14 @@ const Login = () => {
       "email": e.target.email.value,
       "pwd": e.target.pwd.value
     } 
-    axios.post("http://localhost:8000/login", params)
+    api.post("http://localhost:8000/login", params)
     .then(res => console.log(res))
     .catch(err => console.error(err))
 
   }
   const checkEvent = () => {
 
-    axios.get("http://localhost:8000/user", {withCredentials: true})
+    api.get("http://localhost:8000/user")
     .then(res => console.log(res))
     .catch(err => console.error(err))
 
