@@ -21,7 +21,13 @@ const Login = () => {
     api.post("/login", params)
     .then(res => {
       console.log(res)
-      setAuth(res.data.status)
+      if(res.data.status) {
+        setAuth(res.data.status)
+      } else {
+        alert(res.data.message)
+        e.target.email.value = ""
+        e.target.pwd.value = ""
+      }
     })
     .catch(err => console.error(err))
 

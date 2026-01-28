@@ -1,6 +1,8 @@
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from db import findOne, findAll, save
+import mariadb
 
 origins = [
   "http://localhost:5173"
@@ -25,18 +27,31 @@ def read_root():
 
 @app.post("/login")
 def login(loginModel: LoginModel, response: Response):
-  response.set_cookie(
-    key="user",
-    value=loginModel.email,
-    max_age=60 * 60,        # 1시간 (초)
-    expires=60 * 60,        # max_age와 유사 (초)
-    path="/",
-    domain="localhost",
-    secure=True,            # HTTPS에서만 전송
-    httponly=True,          # JS 접근 차단 (⭐ 보안 중요)
-    samesite="lax",         # 'lax' | 'strict' | 'none'
-  )
-  return {"status": True, "model": loginModel}
+  msg = "잘못된 정보 입니다."
+  try:
+    sql = f"""
+      select * from edu.user 
+       WHERE `delYn` = 0 
+         AND `email` = '{loginModel.email}' 
+         AND `password` = '{loginModel.pwd}'
+    """
+    data = findOne(sql)
+    if data:
+      response.set_cookie(
+        key="user",
+        value=data["no"],
+        max_age=60 * 60,        # 1시간 (초)
+        expires=60 * 60,        # max_age와 유사 (초)
+        path="/",
+        domain="localhost",
+        secure=True,            # HTTPS에서만 전송
+        httponly=True,          # JS 접근 차단 (⭐ 보안 중요)
+        samesite="lax",         # 'lax' | 'strict' | 'none'
+      )
+      return {"status": True}
+  except mariadb.Error as e:
+    print(f"SQL 오류 : {e}")
+  return {"status": False, "message": msg}
 
 @app.post("/logout")
 def logout(response: Response):
