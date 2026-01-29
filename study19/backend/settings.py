@@ -7,6 +7,7 @@ class Settings(BaseSettings):
   mariadb_database: str
   mariadb_port: int
   react_url: str
+  login_sql: str = "select `no`, `name` from edu.user where `email` = '{email}' and `password` = '{pwd}'"
 
   model_config = SettingsConfigDict(
     env_file=".env",

@@ -1,16 +1,15 @@
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from db import findOne, findAll, save
 import mariadb
+from settings import settings
 
-origins = [
-  "http://localhost:5173"
-]
+origins = [ settings.react_url ]
 
 class LoginModel(BaseModel):
-  email: str
-  pwd: str
+  email: str = Field(..., title="이메일 주소", description="로그인를 위한 이메일 주소 입니다.")
+  pwd: str = Field(..., title="비밀번호", description="로그인를 위한 비밀번호 입니다.")
 
 app = FastAPI()
 app.add_middleware(
