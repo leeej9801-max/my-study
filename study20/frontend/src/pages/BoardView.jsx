@@ -2,6 +2,7 @@ import { useState , useEffect } from 'react'
 import { useNavigate, useParams } from "react-router";
 import { api } from '@utils/network.js'
 import { useAuth } from '@hooks/AuthProvider.jsx'
+import { useCookies } from 'react-cookie'
 
 const BoardView = () => {
   const [no, setNo] = useState(0)
@@ -11,6 +12,7 @@ const BoardView = () => {
   const params = useParams();
   const navigate = useNavigate()
   const { checkAuth } = useAuth()
+  const [cookies, setCookie, removeCookie] = useCookies(['ck']);
   const deleteEvent = () => {
     alert("정상적으로 삭제 처리가 되었습니다.")
     navigate("/")
@@ -23,6 +25,9 @@ const BoardView = () => {
   }
   useEffect(()=>{
     if(!checkAuth()) navigate("/")
+    console.log("cookie", window.atob(cookies.boardNo) )
+    api.post("/board").then(res=>console.log(res))
+
     console.log(params.no)
     const data = { "no": 1, "title": "샘플을 만들었어요", "content": "내용을 작성해 주세요.", "name": "이나라" }
     setData(data)

@@ -31,7 +31,7 @@ const UserEdit = () => {
   }, [])
   return (
     <div className="container mt-3">
-			<h1 className="display-1 text-center">회원정보</h1>
+			<h1 className="display-1 text-center">회원수정</h1>
 			<form onSubmit={submitEvent}>
 				<div className="mb-3 mt-3">
 					<label htmlFor="name" className="form-label">이름</label>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { api } from '@utils/network.js'
 import { useNavigate } from "react-router";
 import { useAuth } from '@hooks/AuthProvider.jsx'
+import { useCookies } from 'react-cookie'
 
 const Pagination = ({ total, page, pagingEvent }) => {
   return (
@@ -39,6 +40,7 @@ const Home = () => {
   const [search, setSearch] = useState("")
   const navigate = useNavigate()
   const { checkAuth } = useAuth()
+  const [cookies, setCookie, removeCookie] = useCookies(['ck']);
   const searchEvent = e => {
     e.preventDefault()
     //getData(1, search)
@@ -53,6 +55,7 @@ const Home = () => {
     if(checkAuth()) navigate('/boardadd')
   }
   const boardView = no => {
+    setCookie("boardNo", window.btoa(no) )
     if(checkAuth()) navigate(`/boardview/${no}`)
   }
 /*
