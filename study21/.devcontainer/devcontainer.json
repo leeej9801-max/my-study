@@ -1,0 +1,11 @@
+{
+  "name": "React",
+  "service": "react",
+  "dockerComposeFile": "./compose.yml",
+  "workspaceFolder": "/workspace",
+  "customizations": {
+    "vscode": {
+      "extensions": []
+    }
+  }
+}
