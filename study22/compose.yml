@@ -1,0 +1,48 @@
+services:
+  react.shellfolder.com:
+    container_name: react.shellfolder.com
+    image: node:24.13.0
+    depends_on:
+      - fastapi.shellfolder.com
+    ports:
+      - 5173:5173
+    volumes:
+      - ./frontend:/workspace
+    command: ["sleep", "infinity"]
+
+  fastapi.shellfolder.com:
+    container_name: fastapi.shellfolder.com
+    image: uv:1
+    depends_on:
+      - mariadb
+      - redis
+    ports:
+      - 8000:8000
+    working_dir: /workspace
+    volumes:
+      - ./backend:/workspace
+    command: ["sleep", "infinity"]
+
+  mariadb:
+    container_name: mariadb
+    image: mariadb:12.1.2
+    restart: always
+    ports:
+      - 3306:3306
+    volumes:
+      - ./mariadb/conf.d:/etc/mysql/conf.d:ro
+      - ./mariadb/data:/var/lib/mysql:rw
+      - ./mariadb/initdb.d:/docker-entrypoint-initdb.d:ro
+    environment:
+      - MARIADB_HOST=localhost
+      - MARIADB_PORT=3306
+      - MARIADB_ROOT_PASSWORD=1234
+      - MARIADB_DATABASE=edu
+      - TZ=Asia/Seoul
+      - LC_ALL:en_US.UTF-8
+  redis:
+    container_name: redis
+    image: redis:8.4.0
+    restart: always
+    ports:
+      - 6379:6379
