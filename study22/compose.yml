@@ -1,17 +1,17 @@
 services:
-  react.shellfolder.com:
-    container_name: react.shellfolder.com
+  react.myapp.com:
+    container_name: react.myapp.com
     image: node:24.13.0
     depends_on:
-      - fastapi.shellfolder.com
+      - fastapi.myapp.com
     ports:
       - 5173:5173
     volumes:
       - ./frontend:/workspace
     command: ["sleep", "infinity"]
 
-  fastapi.shellfolder.com:
-    container_name: fastapi.shellfolder.com
+  fastapi.myapp.com:
+    container_name: fastapi.myapp.com
     image: uv:1
     depends_on:
       - mariadb

@@ -9,7 +9,7 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5173,
-    allowedHosts: ['react','localhost','react.shellfolder.com','quadecologics.cloud'],
+    allowedHosts: ['react','localhost','react.shellfolder.com','quadecologics.cloud','react.myapp.com'],
     // host: true,
   },
   resolve: {
