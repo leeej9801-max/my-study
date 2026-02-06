@@ -1,17 +1,26 @@
 from fastapi import FastAPI
 from kafka import KafkaProducer
 from settings import settings
+from pydantic import EmailStr, BaseModel
+import json
+
+class EmailModel(BaseModel):
+  email: EmailStr
+  msg: str
 
 app = FastAPI()
 
-pd = KafkaProducer(bootstrap_servers=settings.kafka_server)
+pd = KafkaProducer(
+  bootstrap_servers=settings.kafka_server,
+  value_serializer=lambda v: json.dumps(v).encode("utf-8")
+)
 
 @app.get("/")
 def root():
   return {"msg": "Producer"}
 
 @app.post("/pd")
-def producer(msg: str):
-  pd.send(settings.kafka_topic, msg.encode("utf-8"))
+def producer(model: EmailModel):
+  pd.send(settings.kafka_topic, dict(model))
   pd.flush()
   return {"status": True}

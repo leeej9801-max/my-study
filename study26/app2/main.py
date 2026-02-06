@@ -4,6 +4,7 @@ from settings import settings
 import threading
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 import asyncio
+import json
 
 app = FastAPI()
 
@@ -36,12 +37,15 @@ async def simple_send(msg: str, email: str):
   await fm.send_message(message)
 
 def consumer():
-  cs = KafkaConsumer(settings.kafka_topic, 
-                     bootstrap_servers=settings.kafka_server, 
-                     value_deserializer=lambda v: v.decode("utf-8"))
+  cs = KafkaConsumer(
+    settings.kafka_topic, 
+    bootstrap_servers=settings.kafka_server, 
+    enable_auto_commit=True,
+    value_deserializer=lambda v: json.loads(v.decode("utf-8"))
+  )
   for msg in cs:
     print(msg.value) # 비즈니스 로직 여기서 처리
-    asyncio.run(simple_send(msg.value, settings.mail_from))
+    asyncio.run(simple_send(msg.value["msg"], msg.value["email"]))
 
 @app.on_event("startup")
 def startConsumer():
