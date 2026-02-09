@@ -10,11 +10,26 @@ from jose import jwt, JWTError, ExpiredSignatureError
 from db import findOne
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from logger import log
+from fastapi.middleware.cors import CORSMiddleware
+
+origins = [ "http://localhost:5173" ]
+
+app = FastAPI(title="Producer")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 security = HTTPBearer()
 
 class EmailModel(BaseModel):
   email: EmailStr
+
+class CodeModel(BaseModel):
+  id: str
 
 def set_token(email: str):
   try:
@@ -44,12 +59,9 @@ def get_payload(credentials: HTTPAuthorizationCredentials = Depends(security)):
       payload = jwt.decode(credentials.credentials, settings.secret_key, algorithms=settings.algorithm)
       exp = payload.get("exp")
 
-      if datetime.now(timezone.utc).timestamp() > exp:
-        log().info("Token 유효 시간이 지났습니다.")
-      else:
-        now = datetime.now(timezone.utc).timestamp()
-        minutes, remaining_seconds = divmod(int(exp - now), 60)
-        log().info(f"Token 유효 시간 : {minutes} 분 {remaining_seconds} 초")
+      now = datetime.now(timezone.utc).timestamp()
+      minutes, remaining_seconds = divmod(int(exp - now), 60)
+      log().info(f"Token 유효 시간 : {minutes} 분 {remaining_seconds} 초")
       return payload
     except ExpiredSignatureError as e:
       log().info(f"JWT EXPIRED : {e}")
@@ -64,8 +76,6 @@ def get_payload(credentials: HTTPAuthorizationCredentials = Depends(security)):
         detail="Invalid token",
       )
   return None
-
-app = FastAPI(title="Producer")
 
 pd = KafkaProducer(
   bootstrap_servers=settings.kafka_server,
@@ -85,23 +95,27 @@ def root():
 
 @app.post("/login")
 def producer(model: EmailModel):
-  pd.send(settings.kafka_topic, dict(model))
-  pd.flush()
-  return {"status": True}
+  sql = f"select `no`, `name` from edu.user where `email` = '{model.email}'"
+  data = findOne(sql)
+  if data:
+    pd.send(settings.kafka_topic, dict(model))
+    pd.flush()
+    return {"status": True}
+  return {"status": False}
 
 @app.post("/code")
-def code(id: str):
-  print(id)
-  result = client.get(id)
+def code(model: CodeModel):
+  print(model.id)
+  result = client.get(model.id)
   if result:
     access_token = set_token(result)
     if access_token:
-      client.delete(id)
+      client.delete(model.id)
       return {"status": True, "access_token": access_token}
   return {"status": False}
 
 @app.post("/me")
 def me(payload = Depends(get_payload)):
   if payload:
-    return {"status": True, "payload": payload}
+    return {"status": True, "name": payload["name"]}
   return {"status": False}
