@@ -5,8 +5,18 @@ import threading
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 import asyncio
 import json
+import uuid
+import random
+import string
+import redis
 
-app = FastAPI()
+app = FastAPI(title="Consumer")
+
+client = redis.Redis(
+  host=settings.redis_host,
+  port=settings.redis_port,
+  db=settings.redis_db
+)
 
 conf = ConnectionConfig(
   MAIL_USERNAME = settings.mail_username,
@@ -22,9 +32,12 @@ conf = ConnectionConfig(
 )
 
 async def simple_send(email: str):
+  # key = uuid.uuid4().hex
+  id = ''.join(random.choices(string.digits, k=6))
+  client.setex(id, 60*3, email)
   html = f"""
     <h1>Login Service</h1>
-    <p></p>
+    <p>{id}</p>
   """
 
   message = MessageSchema(
