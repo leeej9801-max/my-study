@@ -78,3 +78,9 @@ cd /opt/kafka/bin/
 ```bash
 ./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test
 ```
+
+## App2 Container 생성
+
+```bash
+docker run -d -it -p 8002:8000 --network study29_my-bridge -v ./app2:/workspace --name app2 uv:1
+```
