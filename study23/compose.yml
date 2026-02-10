@@ -1,0 +1,59 @@
+services:
+  react:
+    container_name: react
+    # image: node:24.13.0
+    build:
+      context: .
+      dockerfile: react.Dockerfile
+    depends_on:
+      - fastapi
+    ports:
+      - 5173:5173
+    working_dir: /workspace
+    # volumes:
+    #   - ./frontend:/workspace
+    environment:
+      - VITE_APP_FASTAPI_URL=http://fastapi:8000
+    # command: ["sleep", "infinity"]
+    command: [ "npm", "run", "dev" ]
+
+  fastapi:
+    container_name: fastapi
+    # image: uv:1
+    build:
+      context: .
+      dockerfile: fastapi.Dockerfile
+    depends_on:
+      - mariadb
+      - redis
+    ports:
+      - 8000:8000
+    working_dir: /workspace
+    # volumes:
+    #   - ./backend:/workspace
+    # command: ["sleep", "infinity"]
+    command: ["uv", "run", "fastapi", "run"]
+
+  mariadb:
+    container_name: mariadb
+    image: mariadb:12.1.2
+    restart: always
+    ports:
+      - 3306:3306
+    volumes:
+      - ./mariadb/conf.d:/etc/mysql/conf.d:ro
+      - ./mariadb/data:/var/lib/mysql:rw
+      - ./mariadb/initdb.d:/docker-entrypoint-initdb.d:ro
+    environment:
+      - MARIADB_HOST=localhost
+      - MARIADB_PORT=3306
+      - MARIADB_ROOT_PASSWORD=1234
+      - MARIADB_DATABASE=edu
+      - TZ=Asia/Seoul
+      - LC_ALL:en_US.UTF-8
+  redis:
+    container_name: redis
+    image: redis:8.4.0
+    restart: always
+    ports:
+      - 6379:6379
