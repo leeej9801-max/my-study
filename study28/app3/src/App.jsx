@@ -3,7 +3,7 @@ import axios from "axios"
 const App = () => {
   const event1 = e => {
     e.preventDefault()
-    axios.get(`${import.meta.env.VITE_APP_FASTAPI_URL}/`)
+    axios.post(`${import.meta.env.VITE_APP_FASTAPI_URL}/login`)
     .then(res=>console.log(res))
     .catch(err=>console.error(err))
   }

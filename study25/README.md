@@ -33,6 +33,11 @@ docker exec -it kafka /bin/bash
 ./kafka-topics.sh --bootstrap-server localhost:9092 --delete --topic my-topic
 ```
 
+## 메시지 확인 
+```bash
+./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test
+```
+
 ## Apache Kafka 명령어 
 
 - `kafka-topics.sh` : 토픽 생성/조회/수정/삭제 명령어

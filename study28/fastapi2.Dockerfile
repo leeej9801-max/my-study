@@ -11,7 +11,7 @@ COPY ./app2/pyproject.toml ./app2/uv.lock ./
 
 RUN uv sync --frozen --no-dev
 
-COPY ./app1/.env ./.env
+COPY ./app2/.env ./.env
 COPY ./app2/src ./src
 
 FROM python:3.13.11
