@@ -84,3 +84,31 @@ cd /opt/kafka/bin/
 ```bash
 docker run -d -it -p 8002:8000 --network study29_my-bridge -v ./app2:/workspace --name app2 uv:1
 ```
+
+## App3 Container 생성
+```bash
+docker run -d -it -p 80:5173 --network study29_my-bridge -v ./app3:/workspace --name app3 node:24.13.0
+```
+
+## `vite.config.js` 설정
+```js
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { fileURLToPath, URL } from 'url'
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  base: "/",
+  server: {
+    host: '0.0.0.0',
+    port: 5173,
+    allowedHosts: ['localhost'],
+  },
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    }
+  },
+})
+```
