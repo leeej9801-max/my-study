@@ -62,7 +62,7 @@ const App = () => {
     const formData = new FormData();
     formData.append("txt", e.target.txt.value)
     files.forEach(file => formData.append("files", file))
-    axios.post("http://localhost:8000/upload", formData, config)
+    axios.post("http://app1:8000/upload", formData, config)
     .then(res=>console.log(res))
     .catch(err=>console.error(err))
   }

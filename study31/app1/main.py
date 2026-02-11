@@ -6,6 +6,7 @@ from typing import List
 from fastapi.middleware.cors import CORSMiddleware
 import shutil
 import uuid
+from db import findOne, findAll, save, add_key
 
 class FileItem(BaseModel):
   filename: str
@@ -16,7 +17,7 @@ class FileModel(BaseModel):
   txt: str
   files: List[str]
 
-origins = [ "http://localhost:5173" ]
+origins = [ "http://localhost:5173", "http://app2:5173", "http://app2" ]
 
 app = FastAPI()
 app.add_middleware(
@@ -43,11 +44,19 @@ def saveFile(file):
   ext = origin.split(".")[-1].lower()
   id = uuid.uuid4().hex
   newName = f"{id}.{ext}"
-  data = { "id": id, "origin": origin, "ext": ext, "newName": newName }
-  db.append(data)
-  path = UPLOAD_DIR / newName
-  with path.open("wb") as f:
-    shutil.copyfileobj(file.file, f)
+  # data = { "id": id, "origin": origin, "ext": ext, "newName": newName }
+  # db.append(data)
+  sql = f"""
+    insert into edu.`file` (`origin`, `ext`, `fileName`, `contentType`) 
+    value ('{origin}','{ext}','{newName}','{file.content_type}')
+  """
+  result = add_key(sql)
+  if result[0]:
+    path = UPLOAD_DIR / newName
+    with path.open("wb") as f:
+      shutil.copyfileobj(file.file, f)
+    return result[1]
+  return 0
 
 @app.get("/")
 def root():
@@ -56,9 +65,10 @@ def root():
 @app.post("/upload")
 def upload(files: List[UploadFile] = File(), txt: str = Form()):
   print(txt)
+  arr = []
   for file in files:
-    saveFile(file)
-  return {"status": True}
+    arr.append(saveFile(file))
+  return {"status": True, "result": arr}
 
 @app.post("/upload2")
 def upload(model: FileModel):
@@ -71,13 +81,17 @@ def images():
 
 @app.get("/download")
 def download(id: str):
-  for row in db:
-    if row["id"] == id:
-      newName = row["newName"]
-      origin = row["origin"]
-      break
-  if newName:
-    print(newName)
+  # for row in db:
+  #   if row["id"] == id:
+  #     newName = row["newName"]
+  #     origin = row["origin"]
+  #     break
+  sql = f"select `origin`, `fileName` from edu.`file` where `no` = {id}"
+  result = findOne(sql)
+  if result:
+    print(result)
+    origin = result["origin"]
+    newName = result["fileName"]
     path = UPLOAD_DIR / newName
     return FileResponse(path=path, filename=origin)
   return {"status": False}
