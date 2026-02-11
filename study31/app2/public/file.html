@@ -27,7 +27,7 @@
       align-items: center;
       justify-content: center;
     }
-    main form {
+    main .form {
       display: flex;
       flex-direction: row;
       justify-content: center;
@@ -35,7 +35,7 @@
       padding: 16px;
       margin: 0 5%;
     }
-    main input[type=file] {
+    main input[type=file], main input[type=text]  {
       width: 100%;
       color: #000;
       background-color: #FFF;
@@ -51,7 +51,7 @@
     }
     main input[type=submit] {
       width: 100%;
-      max-width: 300px;
+      /* max-width: 300px; */
       background-color: #42B883;
       padding: 16px;
       color: #FFF;
@@ -70,9 +70,19 @@
     <h1>File Upload</h1>
   </header>
   <main>
-    <form action="" method="post" enctype="multipart/form-data">
-      <input type="file" name="file" id="file" accept="image/*" />
-      <input type="submit" value="파일업로드">
+    <form action="http://localhost:8000/upload" method="post" enctype="multipart/form-data">
+      <div class="form">
+        <input type="text" name="txt" id="txt"  />
+      </div>
+      <div class="form">
+        <input type="file" name="file" id="file1" multiple accept="image/*" />
+      </div>
+      <!-- <div class="form">
+        <input type="file" name="file" id="file2" accept="image/*" />
+      </div> -->
+      <div class="form">
+        <input type="submit" value="파일업로드">
+      </div>
     </form>
   </main>
 </body>

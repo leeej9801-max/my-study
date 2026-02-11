@@ -1,6 +1,28 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile, Form
 from pathlib import Path
+from pydantic import BaseModel
+from typing import List
+from fastapi.middleware.cors import CORSMiddleware
+
+class FileItem(BaseModel):
+  filename: str
+  content_type: str
+  content_base64: str
+
+class FileModel(BaseModel):
+  txt: str
+  files: List[str]
+
+origins = [ "http://localhost:5173" ]
+
 app = FastAPI()
+app.add_middleware(
+  CORSMiddleware,
+  allow_origins=origins,
+  allow_credentials=True,
+  allow_methods=["*"],
+  allow_headers=["*"],
+)
 
 UPLOAD_DIR = Path("uploads")
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
@@ -11,4 +33,15 @@ def checkDir():
 
 @app.get("/")
 def root():
+  return {"status": True}
+
+@app.post("/upload")
+def upload(files: List[UploadFile] = File(), txt: str = Form()):
+  print(txt)
+  print(files)
+  return {"status": True}
+
+@app.post("/upload2")
+def upload(model: FileModel):
+  print(model)
   return {"status": True}
