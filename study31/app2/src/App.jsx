@@ -1,6 +1,13 @@
 import axios from 'axios'
+import { useState } from 'react'
 
 const App = () => {
+  const [files, setFiles] = useState([])
+  const config = {
+    headers: {
+      "Content-Type": "multipart/form-data"
+    }
+  }
   const event1 = e => {
     e.preventDefault()
     const fileList = e.target.file.files
@@ -50,18 +57,27 @@ const App = () => {
       }
     })
   }
+  const event3 = e => {
+    e.preventDefault()
+    const formData = new FormData();
+    formData.append("txt", e.target.txt.value)
+    files.forEach(file => formData.append("files", file))
+    axios.post("http://localhost:8000/upload", formData, config)
+    .then(res=>console.log(res))
+    .catch(err=>console.error(err))
+  }
   return (
     <>
       <header>
         <h1>File Upload</h1>
       </header>
       <main>
-        <form onSubmit={event2}>
+        <form onSubmit={event3}>
           <div className="form">
             <input type="text" name="txt" id="txt" />
           </div>
           <div className="form">
-            <input type="file" name="file" id="file1" multiple accept="image/*" />
+            <input type="file" name="file" id="file1" multiple accept="image/*" onChange={e=>setFiles(Array.from(e.target.files))} />
           </div>
           <div className="form">
             <input type="submit" value="파일업로드" />

@@ -1,8 +1,11 @@
 from fastapi import FastAPI, File, UploadFile, Form
+from fastapi.responses import FileResponse
 from pathlib import Path
 from pydantic import BaseModel
 from typing import List
 from fastapi.middleware.cors import CORSMiddleware
+import shutil
+import uuid
 
 class FileItem(BaseModel):
   filename: str
@@ -27,9 +30,24 @@ app.add_middleware(
 UPLOAD_DIR = Path("uploads")
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
 MAX_FILE_SIZE = 10 * 1024
+FILE_CONTENT_TYPE = "image/png"
+
+db = []
 
 def checkDir():
   UPLOAD_DIR.mkdir(exist_ok=True)
+
+def saveFile(file):
+  checkDir()
+  origin = file.filename
+  ext = origin.split(".")[-1].lower()
+  id = uuid.uuid4().hex
+  newName = f"{id}.{ext}"
+  data = { "id": id, "origin": origin, "ext": ext, "newName": newName }
+  db.append(data)
+  path = UPLOAD_DIR / newName
+  with path.open("wb") as f:
+    shutil.copyfileobj(file.file, f)
 
 @app.get("/")
 def root():
@@ -38,10 +56,28 @@ def root():
 @app.post("/upload")
 def upload(files: List[UploadFile] = File(), txt: str = Form()):
   print(txt)
-  print(files)
+  for file in files:
+    saveFile(file)
   return {"status": True}
 
 @app.post("/upload2")
 def upload(model: FileModel):
   print(model)
   return {"status": True}
+
+@app.get("/images")
+def images():
+  return {"status": True, "result": db}
+
+@app.get("/download")
+def download(id: str):
+  for row in db:
+    if row["id"] == id:
+      newName = row["newName"]
+      origin = row["origin"]
+      break
+  if newName:
+    print(newName)
+    path = UPLOAD_DIR / newName
+    return FileResponse(path=path, filename=origin)
+  return {"status": False}
