@@ -140,3 +140,4 @@ vite.config.ts.timestamp-*
 
 .ipynb_checkpoints
 __pycache__
+authorized_keys

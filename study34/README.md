@@ -29,3 +29,31 @@ service ssh status
 ```bash
 ps -ef | grep sshd
 ```
+
+# 2. SSH key 사용하기
+
+- key 생성
+```bash
+ssh-keygen -t ed25519
+```
+
+- 공개키 이름 만들기
+```bash
+cp .ssh/id_ed25519.pub authorized_keys
+```
+
+- Container `.ssh` 폴더 준비
+```bash
+mkdir ~/.ssh
+chmod 700 ~/.ssh
+```
+
+- Container 복사
+```bash
+docker cp ./authorized_keys os:/home/study/.ssh/authorized_keys
+```
+
+- 파일 소유권 설정
+```bash
+chown -R study:study /home/study/.ssh
+```
