@@ -75,3 +75,21 @@ sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
 ```bash
 docker compose version
 ```
+
+## nginx 완전 삭제
+
+```bash
+sudo systemctl stop nginx
+sudo apt purge nginx nginx-common nginx-core
+sudo apt autoremove
+```
+
+- 웹 브라우저에서 접속 테스트
+```bash
+http://인스턴스DNS:80
+```
+
+- 인스턴스 안에서 확인
+```bash
+curl localhost
+```
