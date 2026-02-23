@@ -24,3 +24,28 @@ kubectl run web --image=nginx:1.28 --port 80
 ```bash
 kubectl port-forward pod/web 80:80
 ```
+
+- pod 정보 보기
+```bash
+kubectl get pods -o wide
+```
+
+- pod 접속 하기
+```bash
+kubectl exec -it web -- /bin/bash
+```
+
+- nginx `curl` 명령어로 확인 하기
+```bash
+curl localhost
+```
+
+- 매니페스트 파일 를 이용하여 pod 생성하기
+```bash
+kubectl apply -f web-pod.yaml
+```
+
+# pod 종료 및 삭제
+```bash
+kubectl delete all --all
+```
