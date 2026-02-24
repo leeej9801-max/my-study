@@ -139,5 +139,7 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 .ipynb_checkpoints
+.venv
+.env
 __pycache__
 authorized_keys
