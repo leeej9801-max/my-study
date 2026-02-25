@@ -1,0 +1,39 @@
+services:
+  redis:
+    container_name: redis
+    image: redis:8.4.0
+    restart: always
+    networks:
+      - my-bridge
+  app1:
+    container_name: app1
+    build:
+      context: ./app1
+      dockerfile: dockerfile
+    depends_on:
+      - redis
+    ports:
+      - 8000:8000
+    networks:
+      - my-bridge
+  app2:
+    container_name: app2
+    build:
+      context: ./app2
+      dockerfile: dockerfile
+    depends_on:
+      - redis
+    networks:
+      - my-bridge
+  app3:
+    container_name: app3
+    build:
+      context: ./app3
+      dockerfile: dockerfile
+    depends_on:
+      - redis
+    networks:
+      - my-bridge
+networks:
+  my-bridge:
+    driver: bridge

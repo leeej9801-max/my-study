@@ -8,6 +8,10 @@ class Settings(BaseSettings):
   redirect_uri: str
   dns: str
   secure: bool
+  redis_host: str
+  redis_port: int
+  redis_access_db: int
+  redis_refresh_db: int
 
   model_config = SettingsConfigDict(
     env_file=".env",

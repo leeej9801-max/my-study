@@ -17,8 +17,18 @@ oauth.register(
   client_kwargs={"scope": "profile_nickname profile_image"}
 )
 
-client1 = redis.Redis( host="redis", port=6379, db=0, decode_responses=True) # access_token
-client2 = redis.Redis( host="redis", port=6379, db=1, decode_responses=True ) # refresh_token
+client1 = redis.Redis( 
+  host=settings.redis_host, 
+  port=settings.redis_port, 
+  db=settings.redis_access_db, 
+  decode_responses=True 
+) # access_token
+client2 = redis.Redis( 
+  host=settings.redis_host, 
+  port=settings.redis_port, 
+  db=settings.redis_refresh_db, 
+  decode_responses=True 
+) # refresh_token
 
 app = FastAPI(title=settings.title, root_path=settings.root_path)
 app.add_middleware(
@@ -66,7 +76,7 @@ async def kakaoCallback(code: str, response: Response):
     tokens = tokenResponse.json()
 
     if tokenResponse.status_code == 200:
-      print(tokens)
+
       access_token = tokens.get("access_token")
       expires_in = tokens.get("expires_in")
 
@@ -120,7 +130,6 @@ async def kakaoCallback(code: str, response: Response):
 async def me(accept: str = Cookie(default=None)):
   if accept:
     access_token = client1.get(accept)
-    print(accept, access_token)
     async with httpx.AsyncClient() as client:
       userResponse = await getUserInfo(client, access_token)
       userInfo = userResponse.json()
