@@ -47,12 +47,19 @@ class ReverseProxyMiddleware(BaseHTTPMiddleware):
         content=body,
         params=request.query_params,
       )
-      response_headers = {k: v for k, v in proxy_resp.headers.items() if k.lower() not in excluded_headers}
-      return Response(
+      #response_headers = {k: v for k, v in proxy_resp.headers.items() if k.lower() not in excluded_headers}
+      #return Response(
+      #  content=proxy_resp.content,
+      #  status_code=proxy_resp.status_code,
+      #  headers=response_headers
+      #)
+      response_headers = [(k.encode("latin-1"), v.encode("latin-1")) for k, v in proxy_resp.headers.multi_items() if k.lower() not in excluded_headers]
+      response = Response(
         content=proxy_resp.content,
         status_code=proxy_resp.status_code,
-        headers=response_headers
       )
+      response.raw_headers = response_headers
+      return response
     except httpx.RequestError as exc:
       print(f"Proxy error: {exc}")
       raise HTTPException(status_code=502, detail="Bad Gateway")

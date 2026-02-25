@@ -5,6 +5,9 @@ class Settings(BaseSettings):
   root_path: str
   client_id: str
   client_secret: str
+  redirect_uri: str
+  dns: str
+  secure: bool
 
   model_config = SettingsConfigDict(
     env_file=".env",
