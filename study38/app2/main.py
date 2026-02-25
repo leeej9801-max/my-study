@@ -3,6 +3,8 @@ from settings import settings
 from authlib.integrations.starlette_client import OAuth
 from starlette.middleware.sessions import SessionMiddleware
 import httpx
+import redis
+import uuid
 
 oauth = OAuth()
 oauth.register(
@@ -14,6 +16,9 @@ oauth.register(
   api_base_url="https://kapi.kakao.com",
   client_kwargs={"scope": "profile_nickname profile_image"}
 )
+
+client1 = redis.Redis( host="redis", port=6379, db=0, decode_responses=True) # access_token
+client2 = redis.Redis( host="redis", port=6379, db=1, decode_responses=True ) # refresh_token
 
 app = FastAPI(title=settings.title, root_path=settings.root_path)
 app.add_middleware(
@@ -59,7 +64,7 @@ async def kakaoCallback(code: str, response: Response):
   async with httpx.AsyncClient() as client:
     tokenResponse = await getToken(client, code)
     tokens = tokenResponse.json()
-    
+
     if tokenResponse.status_code == 200:
       print(tokens)
       access_token = tokens.get("access_token")
@@ -68,9 +73,13 @@ async def kakaoCallback(code: str, response: Response):
       refresh_token = tokens.get("refresh_token")
       refresh_token_expires_in = tokens.get("refresh_token_expires_in")
 
+      id = uuid.uuid4().hex
+      client1.setex(id, int(expires_in), access_token)
+      client2.setex(id, int(refresh_token_expires_in), refresh_token)
+      
       response.set_cookie(
-        key="access_token",
-        value=access_token,
+        key="accept",
+        value=id,
         max_age=int(expires_in),
         expires=int(expires_in),
         path="/",
@@ -79,18 +88,28 @@ async def kakaoCallback(code: str, response: Response):
         httponly=True,
         samesite="lax",
       )
-
-      response.set_cookie(
-        key="refresh_token",
-        value=refresh_token,
-        max_age=int(refresh_token_expires_in),
-        expires=int(refresh_token_expires_in),
-        path="/",
-        domain=settings.dns,
-        secure=settings.secure,
-        httponly=True,
-        samesite="lax",
-      )
+      #response.set_cookie(
+      #  key="access_token",
+      #  value=access_token,
+      #  max_age=int(expires_in),
+      #  expires=int(expires_in),
+      #  path="/",
+      #  domain=settings.dns,
+      #  secure=settings.secure,
+      #  httponly=True,
+      #  samesite="lax",
+      #)
+      #response.set_cookie(
+      #  key="refresh_token",
+      #  value=refresh_token,
+      #  max_age=int(refresh_token_expires_in),
+      #  expires=int(refresh_token_expires_in),
+      #  path="/",
+      #  domain=settings.dns,
+      #  secure=settings.secure,
+      #  httponly=True,
+      #  samesite="lax",
+      #)
 
       return {"status": True}
   return {"status": False}
@@ -98,26 +117,33 @@ async def kakaoCallback(code: str, response: Response):
   # return {"access_token": access_token}
 
 @app.get("/me")
-async def me(access_token: str = Cookie(default=None)):
-  async with httpx.AsyncClient() as client:
-    userResponse = await getUserInfo(client, access_token)
-    userInfo = userResponse.json()
+async def me(accept: str = Cookie(default=None)):
+  if accept:
+    access_token = client1.get(accept)
+    print(accept, access_token)
+    async with httpx.AsyncClient() as client:
+      userResponse = await getUserInfo(client, access_token)
+      userInfo = userResponse.json()
 
-    if userResponse.status_code == 200:
-      user = {
-        "id": userInfo.get("id"),
-        "nickname": userInfo.get("properties")["nickname"],
-        "profile_image": userInfo.get("properties")["profile_image"]
-      }
-      return {"status": True, "userInfo": user}
+      if userResponse.status_code == 200:
+        user = {
+          "id": userInfo.get("id"),
+          "nickname": userInfo.get("properties")["nickname"],
+          "profile_image": userInfo.get("properties")["profile_image"]
+        }
+        return {"status": True, "userInfo": user}
   return {"status": False}
 
 @app.get("/logout")
-async def logout(request: Request, response: Response, access_token: str = Cookie(default=None)):
-  async with httpx.AsyncClient() as client:
-    logoutResponse = await setUserLogout(client, access_token)
-    if logoutResponse.status_code == 200:
-      for cookieName in request.cookies.keys():
-        response.delete_cookie(key=cookieName, path="/", domain=settings.dns)
-      return {"status": True}
+async def logout(request: Request, response: Response, accept: str = Cookie(default=None)):
+  if accept:
+    access_token = client1.get(accept)
+    async with httpx.AsyncClient() as client:
+      logoutResponse = await setUserLogout(client, access_token)
+      if logoutResponse.status_code == 200:
+        client1.delete(accept)
+        client2.delete(accept)
+        for cookieName in request.cookies.keys():
+          response.delete_cookie(key=cookieName, path="/", domain=settings.dns)
+        return {"status": True}
   return {"status": False}
