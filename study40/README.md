@@ -34,3 +34,18 @@ helm install [Chart명] [Package 위치]
 ```bash
 helm uninstall [Chart명]
 ```
+
+- Helm 초기화
+```bash
+helm create [Chart명]
+```
+
+- Helm 배포 초기화 `Repo 폴더`
+```bash
+helm repo index .
+```
+
+- Helm 배포 package `Chart 폴더` : `****.tgz`
+```bash
+helm package [Package 위치]
+```
