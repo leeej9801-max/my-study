@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup as bs
 from requests import get
 import json
+from db import save, saveMany
 
 def getLikes(list, head=None):
   ids = ""
@@ -37,6 +38,7 @@ def cleanData(txt):
   list = ["\n", "\xa0", "\r", "\t", "총건수"]
   for target in list:
     txt = txt.replace(target, "")
+  txt = txt.replace("'", '"')
   return txt.strip()
 
 def crawlingMelon(gnrCode: str, head=None):
@@ -49,7 +51,29 @@ def crawlingMelon(gnrCode: str, head=None):
     data = bs(res.text)
     arr = getData(data)
     arr = getLikes(arr, head)
+    if len(arr) > 0:
+      for row in arr:
+        sql1 = f"""
+            INSERT INTO edu.`melon` 
+            (`id`, `img`, `title`, `album`, `cnt`)
+            VALUE
+            ('{row["id"]}', '{row["img"]}', '{row["title"]}', '{row["album"]}', {row["cnt"]});
+        """
+        #save(sql1)
+      sql1 = "TRUNCATE TABLE edu.`melon`"
+      sql2 = f"""
+          INSERT INTO edu.`melon` 
+          (`id`, `img`, `title`, `album`, `cnt`)
+          VALUE
+          (%s, %s, %s, %s, %s)
+          ON DUPLICATE KEY UPDATE
+            img=VALUES(img),
+            title=VALUES(title),
+            album=VALUES(album),
+            cnt=VALUES(cnt)
+      """
+      values = [(row["id"], row["img"], row["title"], row["album"], row["cnt"]) for row in arr]
+      saveMany(sql1, sql2, values)
   return arr
 
 print( crawlingMelon("GN0100") )
-
