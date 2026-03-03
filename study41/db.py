@@ -94,7 +94,8 @@ def saveMany(sql1:str, sql2: str, values):
     conn = getConn()
     if conn:
       cur = conn.cursor()
-      cur.execute(sql1)
+      if sql1:
+        cur.execute(sql1)
       cur.executemany(sql2, values)
       conn.commit()
       cur.close()

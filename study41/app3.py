@@ -5,11 +5,12 @@ from db import save, saveMany
 
 def getLikes(list, head=None):
   ids = ""
-  for i in range(len(list)):
-    if i == 0:
-      ids += f"{list[i]["id"]}"
-    else:
-      ids += f",{list[i]["id"]}"
+  #for i in range(len(list)):
+  #  if i == 0:
+  #    ids += f"{list[i]["id"]}"
+  #  else:
+  #    ids += f",{list[i]["id"]}"
+  ids = ",".join(str(item["id"]) for item in list)
   if ids:
     url = f"https://www.melon.com/commonlike/getSongLike.json?contsIds={ids}"
     res = get(url, headers=head)
@@ -41,10 +42,10 @@ def cleanData(txt):
   txt = txt.replace("'", '"')
   return txt.strip()
 
-def crawlingMelon(gnrCode: str, head=None):
+def crawlingMelon(code: str, head=None):
   if head is None:
     head = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36'}
-  url = f"https://www.melon.com/genre/song_list.htm?gnrCode={gnrCode}&orderBy=POP"
+  url = f"https://www.melon.com/genre/song_list.htm?gnrCode={code}&orderBy=POP"
   res = get(url, headers=head)
   arr = []
   if res.status_code == 200:
@@ -55,25 +56,35 @@ def crawlingMelon(gnrCode: str, head=None):
       for row in arr:
         sql1 = f"""
             INSERT INTO edu.`melon` 
-            (`id`, `img`, `title`, `album`, `cnt`)
+            (`code`, `id`, `img`, `title`, `album`, `cnt`)
             VALUE
-            ('{row["id"]}', '{row["img"]}', '{row["title"]}', '{row["album"]}', {row["cnt"]});
+            ('{code}', '{row["id"]}', '{row["img"]}', '{row["title"]}', '{row["album"]}', {row["cnt"]});
         """
         #save(sql1)
       sql1 = "TRUNCATE TABLE edu.`melon`"
       sql2 = f"""
           INSERT INTO edu.`melon` 
-          (`id`, `img`, `title`, `album`, `cnt`)
+          (`code`, `id`, `img`, `title`, `album`, `cnt`)
           VALUE
-          (%s, %s, %s, %s, %s)
+          (%s, %s, %s, %s, %s, %s)
           ON DUPLICATE KEY UPDATE
+            id=VALUES(id),
             img=VALUES(img),
             title=VALUES(title),
             album=VALUES(album),
             cnt=VALUES(cnt)
       """
-      values = [(row["id"], row["img"], row["title"], row["album"], row["cnt"]) for row in arr]
-      saveMany(sql1, sql2, values)
+      values = [(code, row["id"], row["img"], row["title"], row["album"], row["cnt"]) for row in arr]
+      saveMany(None, sql2, values)
   return arr
 
-print( crawlingMelon("GN0100") )
+sql = "TRUNCATE TABLE edu.`melon`"
+save(sql)
+crawlingMelon("GN0100")
+crawlingMelon("GN0200")
+crawlingMelon("GN0300")
+crawlingMelon("GN0400")
+crawlingMelon("GN0500")
+crawlingMelon("GN0600")
+crawlingMelon("GN0700")
+crawlingMelon("GN0800")
