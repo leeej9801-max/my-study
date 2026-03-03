@@ -32,3 +32,23 @@ sql = f"""
     ('{id}', '{img}', '{title}', '{album}', {cnt});
 """
 ```
+
+- 장르 코드명
+```sql
+CREATE VIEW edu.`category` AS
+SELECT 'GN0100' AS `code`, '발라드' AS `name`
+UNION ALL
+SELECT 'GN0200' AS `code`, '댄스' AS `name`
+UNION ALL
+SELECT 'GN0300' AS `code`, '랩/힙합' AS `name`
+UNION ALL
+SELECT 'GN0400' AS `code`, 'R&B/Soul' AS `name`
+UNION ALL
+SELECT 'GN0500' AS `code`, '인디음악' AS `name`
+UNION ALL
+SELECT 'GN0600' AS `code`, '록/메탈' AS `name`
+UNION ALL
+SELECT 'GN0700' AS `code`, '트로트' AS `name`
+UNION ALL
+SELECT 'GN0800' AS `code`, '포크/블루스' AS `name`;
+```
