@@ -29,7 +29,7 @@ if url := st.text_input("주소 입력", placeholder="URL을 입력하세요"):
     message_placeholder = st.empty()
     prompt = f"다음 영어 기사를 한글로 번역해주세요:\n {text}"
     stream = ollama.chat(
-      model="gpt-oss:20b",
+      model="gemma3:4b",
       messages=[{"role": "user", "content": prompt}],
       stream=True
     )
