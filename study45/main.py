@@ -1,0 +1,61 @@
+from settings import settings
+import mariadb
+
+conn_params = {
+  "user" : settings.mariadb_user,
+  "password" : settings.mariadb_password,
+  "host" : settings.mariadb_host,
+  "database" : settings.mariadb_database,
+  "port" : settings.mariadb_port
+}
+
+def etl(year:int, month: int):
+  print("db_air 에서 db_to_air 데이터 이관 작업")
+  try:
+    conn = mariadb.connect(**conn_params)
+    if conn:
+      where = f"where 년도 = {year} and 월 = {month}"
+      sql1 = f"delete from db_to_air.`비행` {where}"
+      sql2 = f"insert into db_to_air.`비행` select * from db_air.`비행` {where}"
+      sql3 = f"select count(*) as cnt from db_to_air.`비행` {where}"
+      print("SQL 실행")
+      cur = conn.cursor()
+      cur.execute(sql1)
+      cur.execute(sql2)
+      conn.commit()
+      cur.execute(sql3)
+      row = cur.fetchone()
+      print(f"적재 : {row[0]} 건")
+      cur.close()
+      conn.close()
+  except mariadb.Error as e:
+    print(f"접속 오류 : {e}")
+
+def etl2(table: str, year:int = 0, month: int = 0):
+  print("db_air 에서 db_to_air 데이터 이관 작업")
+  try:
+    conn = mariadb.connect(**conn_params)
+    if conn:
+      where = ""
+      if year > 0 and month > 0:
+        where = f"where 년도 = {year} and 월 = {month}"
+      sql1 = f"delete from db_to_air.`{table}` {where}"
+      sql2 = f"insert into db_to_air.`{table}` select * from db_air.`{table}` {where}"
+      sql3 = f"select count(*) as cnt from db_to_air.`{table}` {where}"
+      print("SQL 실행")
+      cur = conn.cursor()
+      cur.execute(sql1)
+      cur.execute(sql2)
+      conn.commit()
+      cur.execute(sql3)
+      row = cur.fetchone()
+      print(f"{table} 적재 : {row[0]} 건")
+      cur.close()
+      conn.close()
+  except mariadb.Error as e:
+    print(f"접속 오류 : {e}")
+
+if "__main__" == __name__:
+  etl2("비행", 1987, 10)
+  etl2("운반대")
+  etl2("항공사")
