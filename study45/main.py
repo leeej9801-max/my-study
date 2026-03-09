@@ -86,11 +86,15 @@ def etl3(data: dict):
   except mariadb.Error as e:
     print(f"접속 오류 : {e}")
 
-def jobs(useYn: int):
+def jobs(useYn: tuple):
   try:
     conn = mariadb.connect(**conn_params)
     if conn:
-      sql = f"select `no`, `table`, `year`, `month` from db_to_air.jobs where useYn in ({useYn})"
+      if isinstance(useYn, (list, tuple)):
+        keys = ",".join(map(str, useYn))
+      else:
+        keys = useYn
+      sql = f"select `no`, `table`, `year`, `month` from db_to_air.jobs where useYn in ({keys})"
       cur = conn.cursor()
       cur.execute(sql)
       rows = cur.fetchall()
@@ -104,7 +108,8 @@ def jobs(useYn: int):
   return []
 
 if "__main__" == __name__:
-  for row in jobs(1):
+  useYn = tuple([0])
+  for row in jobs(useYn):
     if row: etl3(row)
   # etl2("비행", 1987, 10)
   # etl2("운반대")
