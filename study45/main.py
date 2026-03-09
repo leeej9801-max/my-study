@@ -1,5 +1,9 @@
 from settings import settings
 import mariadb
+from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
+
+app = FastAPI()
 
 conn_params = {
   "user" : settings.mariadb_user,
@@ -107,10 +111,54 @@ def jobs(useYn: tuple):
     print(f"접속 오류 : {e}")
   return []
 
-if "__main__" == __name__:
-  useYn = tuple([0])
+@app.post("/run")
+def etlRun(useYn: tuple[int,...] = ()):
   for row in jobs(useYn):
     if row: etl3(row)
+  return RedirectResponse(url="/list")
+
+@app.post("/list")
+def jobList():
+  try:
+    conn = mariadb.connect(**conn_params)
+    if conn:
+      sql = f"select * from db_to_air.jobs"
+      cur = conn.cursor()
+      cur.execute(sql)
+      rows = cur.fetchall()
+      columns = [desc[0] for desc in cur.description]
+      cur.close()
+      conn.close()
+      result = [dict(zip(columns, row)) for row in rows]
+      return {"status": True, "result": result}
+  except mariadb.Error as e:
+    print(f"접속 오류 : {e}")
+  return {"status": False}
+
+@app.post("/set")
+def jobSet(type: bool = False, jobNo: list[int] = []):
+  try:
+    conn = mariadb.connect(**conn_params)
+    if conn:
+      if isinstance(jobNo, (list, tuple)):
+        keys = ",".join(map(str, jobNo))
+      else:
+        keys = jobNo
+      sql = f"update db_to_air.jobs set `useYn` = {type} where `no` in ({keys})"
+      cur = conn.cursor()
+      cur.execute(sql)
+      conn.commit()
+      cur.close()
+      conn.close()
+      return RedirectResponse(url="/list")
+  except mariadb.Error as e:
+    print(f"접속 오류 : {e}")
+  return {"status": False}
+
+#if "__main__" == __name__:
+#  useYn = tuple([0])
+#  for row in jobs(useYn):
+#    if row: etl3(row)
   # etl2("비행", 1987, 10)
   # etl2("운반대")
   # etl2("항공사")
