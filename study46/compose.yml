@@ -6,6 +6,7 @@ services:
       - N8N_HOST=aiedu.tplinkdns.com
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
+      - N8N_CORS_ALLOW_ORIGIN=*
       - NODE_ENV=production
       - WEBHOOK_URL=http://aiedu.tplinkdns.com:[자신PC포트]
       - N8N_SECURE_COOKIE=false
