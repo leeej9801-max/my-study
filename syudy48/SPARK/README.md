@@ -8,7 +8,7 @@ HOST_IP=192.168.0.[서버IP]
 
 ```bash
 docker build -f dockerfile.jupyter -t my-jupyter:latest .
-ocker build -f dockerfile.spark -t my-spark:latest .
+docker build -f dockerfile.spark -t my-spark:latest .
 ```
 
 ## Docker Container 생성
