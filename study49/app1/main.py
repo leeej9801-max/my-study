@@ -26,8 +26,8 @@ def main():
     for file in all_files:
       file_path = os.path.join(folder_path, file)
       if os.path.isfile(os.path.join(folder_path, file_path)):
-        #save(mariadb_engine, file_path)
-        pass
+        save(mariadb_engine, file_path)
 
 if __name__ == "__main__":
-  main()
+  # main()
+  pass
