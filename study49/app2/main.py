@@ -59,28 +59,29 @@ def save(df, table_name):
     with mariadb_engine.connect() as conn:
       conn.execute(text("TRUNCATE TABLE seoul_metro_temp"))
       conn.commit()
-    # ANSI = cp949
-    # UTF = utf-8
-    df.to_sql(table_name, con=mariadb_engine, if_exists='append', index=False)
-    return True
+      # ANSI = cp949
+      # UTF = utf-8
+      df.to_sql(table_name, con=mariadb_engine, if_exists='append', index=False)
+      return True
   except Exception as e:
-    return False
+    print(f"Failed to save data: {e}")
+  return False
   
-def selectData(df, table_name):
+def selectData(table_name):
   try:
     # properties = {
     #  "user": settings.db_user, 
-    #  "password": settings.db_password, 
+    #  "password": "1234", 
     #  "driver": "org.mariadb.jdbc.Driver",
     #  "char.encoding": "utf-8",
     #  "stringtype": "unspecified"
     # }
     # spDf = spark.read.jdbc(url=settings.jdbc_url, table=table_name, properties=properties)
-    # spDf = spark.read.csv(settings.file_dir, header=True, inferSchema=True, encoding="utf-8")
-    # spDf = spark.read.option("header", "true").option("inferSchema", "true").csv("file:///opt/spark/data/2008.csv")
+    # spDf = spark.read.csv('file:///opt/spark/data/2008.csv', header=True, inferSchema=True, encoding="utf-8")
+    # spDf = spark.read.option("header", "true").option("inferSchema", "true").csv("file:///workspace/work/2008.csv")
 
-    # query = text(f"SELECT * FROM {table_name} WHERE 구분 = '승차'")
-    # df = pd.read_sql(query, con=mariadb_engine)
+    query = text(f"SELECT * FROM {table_name} WHERE 구분 = '승차'")
+    df = pd.read_sql(query, con=mariadb_engine)
     spDf = spark.createDataFrame(df)
 
     print(spDf.columns)
@@ -114,15 +115,15 @@ def read_root():
   if not spark:
     return {"status": False, "error": "Spark session not initialized"}
   try:
-    df = getDataFrame(settings.file_dir)
-    print("데이터 프레임 생성 완료!!")
+    #df = getDataFrame(settings.file_dir)
+    #print("데이터 프레임 생성 완료!!", df.head())
     table_name = "seoul_metro_temp"
-    # save(df, table_name)
-    # print("데이터 적재 완료!!")
-    if not df.empty:
-      result = selectData(df, table_name)
-      print("데이터 프레임 변환 완료!!")
-      return {"status": True, "data": result}
+    #if save(df, table_name):
+    #  print("데이터 적재 완료!!")
+    #if not df.empty:
+    result = selectData(table_name)
+    print("데이터 프레임 변환 완료!!")
+    return {"status": True, "data": result}
   except Exception as e:
     traceback.print_exc()
     return {"status": False, "error": str(e)}
