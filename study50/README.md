@@ -65,6 +65,11 @@ python3 -m venv .venv
 source .venv/bin/activate
 ```
 
+- Huggingface hub 설치
+```bash
+pip install -U "huggingface_hub"
+```
+
 - GPU 확인
 ```bash
 nvidia-smi
