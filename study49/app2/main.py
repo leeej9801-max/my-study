@@ -115,14 +115,15 @@ def read_root():
   if not spark:
     return {"status": False, "error": "Spark session not initialized"}
   try:
-    #df = getDataFrame(settings.file_dir)
-    #print("데이터 프레임 생성 완료!!", df.head())
+    df = getDataFrame(settings.file_dir)
+    print("데이터 프레임 생성 완료!!", df.head())
     table_name = "seoul_metro_temp"
-    #if save(df, table_name):
-    #  print("데이터 적재 완료!!")
+    if save(df, table_name):
+     print("데이터 적재 완료!!")
     #if not df.empty:
-    result = selectData(table_name)
-    print("데이터 프레임 변환 완료!!")
+    #result = selectData(table_name)
+    #print("데이터 프레임 변환 완료!!")
+    result = None
     return {"status": True, "data": result}
   except Exception as e:
     traceback.print_exc()
