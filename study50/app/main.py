@@ -1,6 +1,7 @@
 import ollama
 import json
 import re
+import os
 from typing import List, Optional, Dict, Union
 from requests import get
 from bs4 import BeautifulSoup as bs
@@ -226,6 +227,23 @@ def fetch_episode(link: str) -> List[dict]:
   return episodes
 
 # ------------------------------------------------------
+# 출력 파일 저장
+# ------------------------------------------------------
+
+def save_output(episodes: List[dict], final_graph: GraphResponse):
+  print("=== 결과 저장 ===")
+  
+  os.makedirs("output", exist_ok=True)  # output 폴더 생성
+  
+  with open("output/1_원본데이터.json", "w", encoding="utf-8") as f:
+      json.dump(episodes, f, indent=2, ensure_ascii=False)
+  print("원본 데이터 저장: output/1_원본데이터.json")
+  
+  with open("output/지식그래프_최종.json", "w", encoding="utf-8") as f:
+      json.dump(final_graph.model_dump(), f, ensure_ascii=False, indent=2)
+  print("최종 지식그래프 저장: output/지식그래프_최종.json")
+
+# ------------------------------------------------------
 # 메인 실행 함수
 # ------------------------------------------------------
 def main():
@@ -245,15 +263,12 @@ def main():
 
     final_graph = process_data(all_episodes)
 
-    print(final_graph)
-
-    # 프롬프트 설정
-    prompt = """
-      안녕하세요
-    """
-
-    # LLM 호출
-    # llm_call_structured(prompt)
+    save_output(episodes, final_graph)  # 결과 저장
+        
+    print("=" * 50)
+    print("✅ 지식그래프 생성 완료!")
+    print(f"📊 총 노드 수: {len(final_graph.nodes)}")
+    print(f"🔗 총 관계 수: {len(final_graph.relationships)}")    
   except Exception as e:
     print(f"오류 발생: {e}")
     return 1
