@@ -10,7 +10,7 @@ def setFolder():
     print("폴더가 이미 존재합니다.")
 
 if __name__ == '__main__':
-  setFolder()
-  print(nltk.__version__)
+  #setFolder()
+  #print(nltk.__version__)
   # nltk.download()
-  # nltk.download('punkt_tab')
+  nltk.download('punkt_tab')
