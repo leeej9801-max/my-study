@@ -96,15 +96,15 @@ def step4(tokenizer, padded_data):
 
 if __name__ == "__main__":
   # NLTK 데이터가 없다면 먼저 실행하세요: download_nltk_data()
-  for text in getData():
-    print(text)
+  #for text in getData():
+  #  print(text)
 
-  # sentences = []
-  # text = "Harry Potter was a highly unusual boy in many ways. He didn't like the holidays."
+  sentences = []
+  text = "Harry Potter was a highly unusual boy in many ways. He didn't like the holidays."
   
-  # # 1. 전처리 수행 (첫 번째 문장만 처리됨)
-  # processed_tokens = step1(text)
-  # sentences.append(processed_tokens)
+  # 1. 전처리 수행 (첫 번째 문장만 처리됨)
+  processed_tokens = step1(text)
+  sentences.append(processed_tokens)
   
   # # 2. 인코딩 및 모델 흐름 시작
-  # step2(sentences)
+  step2(sentences)
