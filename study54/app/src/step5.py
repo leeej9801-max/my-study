@@ -104,9 +104,9 @@ def run(middle_dir: str = ""):
   model.to(device)
 
   if not middle_dir:
-    target_dir = os.path.join(settings.model_dir, middle_dir)
-  else:
     target_dir = settings.model_dir
+  else:
+    target_dir = os.path.join(settings.model_dir, middle_dir)
 
   # model_dir에 저장된 첫 번째 가중치 파일을 불러와 테스트
   for filename in os.listdir(target_dir):
