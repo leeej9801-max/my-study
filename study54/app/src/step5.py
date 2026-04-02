@@ -94,7 +94,7 @@ def test2(model, tokenizer, device, keywords:str = "Harry Potter", filename:str 
     print(i, ":", out)
 
 # 4. 실행 진입점
-def run():
+def run(middle_dir: str = ""):
   device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
   tokenizer = tiktoken.get_encoding("gpt2")
   keywords = "Dobby is"
@@ -103,10 +103,15 @@ def run():
   model = GPTModel()
   model.to(device)
 
+  if not middle_dir:
+    target_dir = os.path.join(settings.model_dir, middle_dir)
+  else:
+    target_dir = settings.model_dir
+
   # model_dir에 저장된 첫 번째 가중치 파일을 불러와 테스트
-  for filename in os.listdir(settings.model_dir):
+  for filename in os.listdir(target_dir):
     # 저장된 가중치(state_dict) 로드
-    model.load_state_dict(torch.load(os.path.join(settings.model_dir, filename), 
+    model.load_state_dict(torch.load(os.path.join(target_dir, filename), 
                                       map_location=device, weights_only=True))
     model.eval() # 추론 모드로 전환
     

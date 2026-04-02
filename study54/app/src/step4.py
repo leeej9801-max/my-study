@@ -1,5 +1,6 @@
 import os
 import time
+from datetime import datetime
 from settings import settings
 import torch
 from src.train_model import GPTModel
@@ -63,6 +64,10 @@ def epoch_run(model, optimizer, train_loader, device, tokens_seen, global_step):
 def test(model, optimizer, train_loader, device, num_epochs:int = 10):
   tokens_seen, global_step = 0, -1
   losses = []
+  newFolder = os.path.join(settings.model_dir, datetime.now().strftime("%Y%m%d_%H%M"))
+
+  if not os.path.exists( newFolder ):
+    os.makedirs(newFolder)
 
   for epoch in range(num_epochs):
     model.train() # 모델을 학습 모드로 설정 (드롭아웃, 배치 정규화 등에 영향)
@@ -78,10 +83,10 @@ def test(model, optimizer, train_loader, device, num_epochs:int = 10):
     
     # 각 에폭 종료 후 모델 가중치 저장 (파일명 예: 001.pth, 002.pth)
     save_name = str(epoch + 1).zfill(3) + ".pth"
-    torch.save(model.state_dict(), os.path.join(settings.model_dir, save_name))
+    torch.save(model.state_dict(), os.path.join(newFolder, save_name))
 
   # 모든 에폭이 끝나면 학습 곡선 출력
-  view_loss_curve(losses)
+  # view_loss_curve(losses)
 
 # 5. 실행 시작 함수
 def run(train_loader):
@@ -101,4 +106,4 @@ def run(train_loader):
   optimizer = torch.optim.AdamW(model.parameters(), lr=0.0004, weight_decay=0.1)
 
   # 실제 학습 시작
-  test(model, optimizer, train_loader, device, 1)
+  test(model, optimizer, train_loader, device, 3)
