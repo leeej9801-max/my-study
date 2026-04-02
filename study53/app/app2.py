@@ -43,7 +43,7 @@ print(f"'{keyword}'의 임베딩 벡터값: {word_vector}")
 print("="*100)
 
 # 5. 유사한 단어 찾기
-similar_words = model.wv.most_similar(keyword, topn=size*10)
+similar_words = model.wv.most_similar(keyword, topn=size)
 print(f"'{keyword}'와 유사한 단어들: {size}개")
 for word, score in similar_words:
   if score > 0.5:
