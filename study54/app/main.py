@@ -1,4 +1,4 @@
-from src import step1, step2, step3, step4, step5, step6, step7, step8
+from src import step1, step2, step3, step4, step5, step6, step7, step8, step9
 
 def main():
   # print("1. Step 1: 훈련 데이터 준비")
@@ -15,8 +15,9 @@ def main():
 	# step5.run("20260403_0950")
   # print("5. Step 7: 모델 변환")
   # step7.run("20260403_0950/001.pth", 1)
-  print("6. Step 8: 모델 테스트")
-  step8.run("20260403_1014/001.safetensors")
+  # print("6. Step 8: 모델 테스트")
+  # step8.run("20260403_1014/001.safetensors")
+  step9.run("20260403_1014")
 
 if __name__ == "__main__":
   main()

@@ -11,7 +11,7 @@ def run(last_model_name, version):
   print(f"Using device: {device}")
 
   # 2. 모델 구조 정의 (제공된 train_model.py의 구조와 일치해야 함)
-  model = GPTModel() #
+  model = GPTModel()
   
   # 3. .pth 가중치 로드
   # weights_only=True를 사용하여 안전하게 로드합니다.

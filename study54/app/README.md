@@ -7,6 +7,31 @@ cd llama.cpp
 pip install -r requirements.txt
 ```
 
+- `config.json` 파일 생성 (모델_폴더_경로에 추가)
+```json
+{
+  "architectures": [
+    "GPT2LMHeadModel"
+  ],
+  "model_type": "gpt2",
+  "vocab_size": 50257,
+  "n_positions": 128,
+  "n_ctx": 128,
+  "n_embd": 768,
+  "n_layer": 12,
+  "n_head": 12,
+  "n_inner": 3072,
+  "activation_function": "gelu_new",
+  "resid_pdrop": 0.1,
+  "embd_pdrop": 0.1,
+  "attn_pdrop": 0.1,
+  "layer_norm_epsilon": 1e-05,
+  "initializer_range": 0.02,
+  "bos_token_id": 50256,
+  "eos_token_id": 50256
+}
+```
+
 2. 모델 변환:
 ```bash
 python convert_hf_to_gguf.py  <모델_폴더_경로> --outfile my_model.gguf --outtype f16
