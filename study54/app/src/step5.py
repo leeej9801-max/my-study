@@ -97,7 +97,7 @@ def test2(model, tokenizer, device, keywords:str = "Harry Potter", filename:str 
 def run(middle_dir: str = ""):
   device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
   tokenizer = tiktoken.get_encoding("gpt2")
-  keywords = "Dobby is"
+  keywords = "Harry Potter was"
   
   torch.manual_seed(123)
   model = GPTModel()

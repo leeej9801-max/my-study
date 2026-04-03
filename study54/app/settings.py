@@ -5,6 +5,7 @@ class Settings(BaseSettings):
   target_dir: str = "datasets"
   model_dir: str = "models"
   prefix_name: str = "cleaned_"
+  save_dir: str = "export"
 
   model_config = SettingsConfigDict(
     env_file=".env",
