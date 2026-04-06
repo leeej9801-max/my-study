@@ -64,7 +64,7 @@ def run(token_size:int = 10000):
       
       # 커스텀 데이터셋 생성
       # max_length=32: 한 번에 32개 토큰 학습 / stride=4: 4토큰씩 옆으로 이동하며 샘플링
-      dataset = MyDataset(tokenizer, txt, max_length = 32, stride = 4)
+      dataset = MyDataset(tokenizer, txt, max_length = 32, stride = 64)
       
       # DataLoader 생성: 데이터셋을 배치(batch) 단위로 묶고 순서를 섞음
       # batch_size=128: 한 번에 128개의 데이터를 모델에 전달
@@ -79,7 +79,7 @@ def run(token_size:int = 10000):
 
       # 첫 번째 샘플(x[0])을 디코딩하여 입력과 정답의 관계를 확인
       # 정답(Target)은 입력(Input)보다 항상 한 토큰씩 뒤에 있어야 함
-      print(f"Input: {tokenizer.decode(x[0].tolist())}")
-      print(f"Target: {tokenizer.decode(y[0].tolist())}")
+      # print(f"Input: {tokenizer.decode(x[0].tolist())}")
+      # print(f"Target: {tokenizer.decode(y[0].tolist())}")
           
   return datasets

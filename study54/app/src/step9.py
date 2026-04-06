@@ -8,8 +8,8 @@ def run(last_model_name):
 
   # 1. 저장할 폴더가 없으면 생성
   if not os.path.exists(save_directory):
-      os.makedirs(save_directory)
-      print(f"폴더 생성됨: {save_directory}")
+    os.makedirs(save_directory)
+    print(f"폴더 생성됨: {save_directory}")
 
   # 2. Hugging Face에서 표준 gpt2 토크나이저 로드
   # tiktoken의 gpt2와 어휘 구성이 동일합니다.

@@ -2,7 +2,7 @@ import torch
 import os
 from datetime import datetime
 from safetensors.torch import save_file
-from src.train_model import GPTModel
+from src.train_model import GPTModel, VOCAB_SIZE, CONTEXT_LENGTH, EMB_DIM, NUM_HEADS, NUM_LAYERS
 from settings import settings
 
 def run(last_model_name, version):
@@ -24,12 +24,28 @@ def run(last_model_name, version):
   model.load_state_dict(state_dict)
   model.eval() # 추론 모드로 설정
 
+  # 2. 하이퍼파라미터 정보 출력 (GGUF 변환 시 필요)
+  print(f"--- Model Config for GGUF ---")
+  print(f"vocab_size: {VOCAB_SIZE}")
+  print(f"context_length: {CONTEXT_LENGTH}")
+  print(f"emb_dim: {EMB_DIM}")
+  print(f"num_heads: {NUM_HEADS}")
+  print(f"num_layers: {NUM_LAYERS}")
+
+  # 가중치 딕셔너리에서 mask 관련 키를 모두 삭제
+  full_state_dict = model.state_dict()
+  keys_to_del = [k for k in full_state_dict.keys() if 'attn.mask' in k]
+  for k in keys_to_del:
+    del full_state_dict[k]
+
   newFolder = os.path.join(settings.model_dir, datetime.now().strftime("%Y%m%d_%H%M"))
   if not os.path.exists( newFolder ):
     os.makedirs(newFolder)
 
   # 4. safetensors로 저장
   # model.state_dict()를 직접 전달합니다.
-  save_name = str(version).zfill(3) + ".safetensors"
+  # save_name = str(version).zfill(3) + ".safetensors"
+  save_name = "model.safetensors"
+  # save_file(full_state_dict, os.path.join(newFolder, save_name))
   save_file(model.state_dict(), os.path.join(newFolder, save_name))
   print(f"변환 완료: {save_name}")

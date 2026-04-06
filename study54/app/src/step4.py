@@ -106,4 +106,4 @@ def run(train_loader):
   optimizer = torch.optim.AdamW(model.parameters(), lr=0.0004, weight_decay=0.1)
 
   # 실제 학습 시작
-  test(model, optimizer, train_loader, device, 3)
+  test(model, optimizer, train_loader, device, 1)

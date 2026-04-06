@@ -4,6 +4,8 @@
 ```bash
 git clone https://github.com/ggerganov/llama.cpp
 cd llama.cpp
+python -m venv .venv
+.venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
