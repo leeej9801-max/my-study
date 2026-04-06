@@ -1,0 +1,75 @@
+services:
+  react.myapp.com:
+    container_name: react.myapp.com
+    build:
+      context: .
+      dockerfile: react.Dockerfile
+    depends_on:
+      - fastapi1.myapp.com
+    ports:
+      - 80:80
+    working_dir: /workspace
+
+  fastapi1.myapp.com:
+    container_name: fastapi1.myapp.com
+    build:
+      context: .
+      dockerfile: fastapi1.Dockerfile
+    depends_on:
+      - mariadb
+      - redis
+      - kafka
+    ports:
+      - 8001:8000
+    working_dir: /workspace
+
+  fastapi2.myapp.com:
+    container_name: fastapi2.myapp.com
+    build:
+      context: .
+      dockerfile: fastapi2.Dockerfile
+    depends_on:
+      - redis
+      - kafka
+    ports:
+      - 8002:8000
+    working_dir: /workspace
+
+  mariadb:
+    container_name: mariadb
+    image: mariadb:12.1.2
+    restart: always
+    ports:
+      - 3306:3306
+    volumes:
+      - ./mariadb/conf.d:/etc/mysql/conf.d:ro
+      - ./mariadb/data:/var/lib/mysql:rw
+      - ./mariadb/initdb.d:/docker-entrypoint-initdb.d:ro
+    environment:
+      - MARIADB_HOST=localhost
+      - MARIADB_PORT=3306
+      - MARIADB_ROOT_PASSWORD=1234
+      - MARIADB_DATABASE=edu
+      - TZ=Asia/Seoul
+      - LC_ALL:en_US.UTF-8
+  redis:
+    container_name: redis
+    image: redis:8.4.0
+    restart: always
+    ports:
+      - 6379:6379
+  kafka:
+    container_name: kafka
+    image: apache/kafka:4.0.1
+    ports:
+      - 9092:9092
+    working_dir: /opt/kafka/bin/
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1

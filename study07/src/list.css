@@ -1,0 +1,7 @@
+a.list-group-item:hover {
+  cursor: pointer;
+  font-weight:bold;
+  color:#fff;
+  background-color:#b2327d;
+  box-shadow:5px 5px 10px 5px rgba(77, 71, 71, 0.2);
+}

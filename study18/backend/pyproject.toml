@@ -1,0 +1,12 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi-sessions>=0.3.2",
+    "fastapi[standard]>=0.128.0",
+    "mariadb>=1.1.14",
+    "pydantic-settings>=2.12.0",
+]
