@@ -8,3 +8,5 @@
 - [FAISS 공식문서](https://faiss.ai/)
 - [Chroma 공식문서](https://docs.trychroma.com/docs/overview/introduction)
 - [Pinecone 공식문서](https://docs.pinecone.io/guides/get-started/overview)
+
+<img src="./Gemini_Generated_Agent.png" width="600">
