@@ -8,13 +8,13 @@ embed_models = [
 ]
 
 def main():
-  print("Hello from app!")
+  # print("Hello from app!")
   # print("Step 1 실행: Ollama 모델과의 통신을 위한 간단한 함수")
-  # step01.run()
+  # step01.run(models[3])
   # print("Step 2 실행: Ollama 모델과의 스트리밍(Streaming) 통신을 위한 간단한 함수")
-  # step02.run()
+  # step02.run(models[3])
   # print("Step 3 실행: Ollama 모델과의 통신을 위한 체인(Chain) 구성")
-  # step03.run()
+  # step03.run(models[3])
   # print("Step 4 실행: Ollama Embedding(임베딩) 모델과 RAG(Retrieval-Augmented Generation, 검색 증강 생성)")
   # step04.run()
   # print("Step 5 실행: Ollama Embedding(임베딩) 모델과 RAG(Retrieval-Augmented Generation, 검색 증강 생성) 기술에 스트리밍(Streaming)")
@@ -27,8 +27,8 @@ def main():
   # step08.run()
   # print("Step 9 실행: 그래프 상태값을 업데이트하기")
   # step09.run()
-  # print("Step 10 실행: 그래프 상태값을 Annotated와 operator.add를 이용한 상태 업데이트(Reducer)")
-  # step10.run()
+  print("Step 10 실행: 그래프 상태값을 Annotated와 operator.add를 이용한 상태 업데이트(Reducer)")
+  step10.run()
 
 if __name__ == "__main__":
   main()
