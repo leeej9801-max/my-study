@@ -9,7 +9,7 @@ from langchain_core.messages import AIMessage
 import re
 
 # 1. 모델 설정
-model_name: str = "gemma4:e4b"
+model_name: str = "gpt-oss:20b"
 llm = ChatOllama(
   model=model_name, 
   base_url=settings.ollama_base_url,
@@ -189,6 +189,8 @@ def run():
     graph = setup_graph()
     config = {"configurable": {"thread_id": "1"}} # 세션 아이디 설정
     
+    print(f"번역 프로그램 시작되었습니다. (종료: q, quit, exit)")
+
     while True:
       try:
         user_input = input("User: ")

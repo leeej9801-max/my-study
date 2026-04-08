@@ -11,7 +11,7 @@ from settings import settings
 from src.save_image import save_graph_image
 
 # 1. 모델 설정: Ollama를 사용하여 로컬 또는 원격 LLM 연결
-model_name: str = "gemma4:e4b"
+model_name: str = "llama3.2:3b"
 llm = OllamaLLM(
   model=model_name, 
   base_url=settings.ollama_base_url,
@@ -52,7 +52,7 @@ def setup_graph():
   graph = graph_builder.compile(checkpointer=memory)
   
   # (선택 사항) 그래프의 시각적 구조를 이미지로 저장
-  # save_graph_image(graph)
+  save_graph_image(graph)
   return graph
 
 # 5. 스트리밍 업데이트 함수: 사용자 입력을 처리하고 응답을 출력

@@ -3,7 +3,7 @@ from settings import settings
 from langchain_ollama import ChatOllama
 
 # 1. 모델 설정
-model_name: str = "gemma4:e4b"
+model_name: str = "gpt-oss:20b"
 
 # ChatOllama: Ollama를 통해 실행되는 챗 모델 인터페이스
 llm = ChatOllama(
