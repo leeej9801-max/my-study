@@ -194,6 +194,7 @@ def run():
     while True:
       try:
         user_input = input("User: ")
+
         if user_input.lower() in ["quit", "exit", "q"]:
           print("Goodbye!")
           break
@@ -206,8 +207,8 @@ def run():
         # 마지막 respond 노드의 결과 출력
         print("Assistant:", response["messages"][-1].content)
       except Exception as e:
-          print(f"루프 내 오류: {e}")
-          break
+        print(f"루프 내 오류: {e}")
+        break
 
   except Exception as e:
       print(f"초기화 오류: {e}")
