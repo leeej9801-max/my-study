@@ -3,6 +3,7 @@ from src.core import Query, logger
 from settings import settings
 import httpx
 import json
+import re
 from pydantic import BaseModel, Field
 from fastapi import APIRouter, HTTPException, Depends
 from langchain_ollama import ChatOllama
@@ -59,6 +60,12 @@ async def search_movie_info(query: str) -> str:
     
 tools = [search_movie_info]
 
+def extract_json(text: str) -> dict:
+  match = re.search(r"(\{.*\})", text, re.DOTALL)
+  if match:
+    return json.loads(match.group(1))
+  return json.loads(text)
+
 def create_agent():
   try:
     llm = ChatOllama(
@@ -89,7 +96,8 @@ async def chat(query: Query):
       raise HTTPException(status_code=500, detail="에이전트 초기화 실패")
     inputs = {"messages": [("user", query.input)]}
     result = await agent.ainvoke(inputs)
-    return result
+    raw_content = result["messages"][-1].content
+    return extract_json(raw_content)
   except Exception as e:
     logger.error(f"실행 중 에러: {str(e)}")
     raise HTTPException(
