@@ -1,14 +1,16 @@
 import logging
-import httpx
 import json
 import re
-from langchain.tools import tool
-from pydantic import BaseModel, Field
+
+import httpx
 from settings import settings
 from contextlib import asynccontextmanager
+
+from fastapi import FastAPI, Request
+from pydantic import BaseModel, Field
 from langchain_ollama import ChatOllama
 from langgraph.prebuilt import create_react_agent
-from fastapi import FastAPI, Request
+from langchain.tools import tool
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -21,11 +23,20 @@ class MovieItem(BaseModel):
   title: str = Field(description="제목")
   poster: str = Field(description="포스터 이미지 URL")
   year: str = Field(description="개봉 년도")
-  type: str = Field(description="유형")
+  type: str = Field(description="유형 (movie, series 등)")
 
 class MovieListResponse(BaseModel):
   movies: list[MovieItem] = Field(description="검색된 영화 리스트")
   count: int = Field(description="검색된 총 영화 개수")
+
+def get_app_state(request: Request):
+  return request.app.state
+
+def extract_json(text: str) -> dict:
+  match = re.search(r"(\{.*\})", text, re.DOTALL)
+  if match:
+      return json.loads(match.group(1))
+  return json.loads(text)
 
 @tool
 async def search_movie_info(query: str) -> str:
@@ -47,12 +58,12 @@ async def search_movie_info(query: str) -> str:
         search_results = data.get("Search", [])
         formatted_data = [
           {
-            "imdbID": movie.get("imdbID"),
-            "title": movie.get("Title"),
-            "poster": movie.get("Poster"),
-            "year": movie.get("Year"),
-            "type": movie.get("Type")
-          } for movie in search_results
+            "imdbID": m.get("imdbID"),
+            "title": m.get("Title"),
+            "poster": m.get("Poster"),
+            "year": m.get("Year"),
+            "type": m.get("Type")
+          } for m in search_results
         ]
         return json.dumps(formatted_data, ensure_ascii=False)
       else:
@@ -64,17 +75,8 @@ async def search_movie_info(query: str) -> str:
     except Exception as e:
       logger.error(f"예상치 못한 오류: {str(e)}")
       return json.dumps({"error": "네트워크 연결이 원활하지 않습니다."}, ensure_ascii=False)
-    
+
 tools = [search_movie_info]
-
-def extract_json(text: str) -> dict:
-  match = re.search(r"(\{.*\})", text, re.DOTALL)
-  if match:
-    return json.loads(match.group(1))
-  return json.loads(text)
-
-def get_app_state(request: Request):
-  return request.app.state
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
