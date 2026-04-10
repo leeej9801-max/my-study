@@ -5,7 +5,7 @@ import httpx
 import json
 import re
 from pydantic import BaseModel, Field
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException
 from langchain_ollama import ChatOllama
 from langgraph.prebuilt import create_react_agent
 
