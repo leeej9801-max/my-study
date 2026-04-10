@@ -97,7 +97,9 @@ async def chat(query: Query):
     inputs = {"messages": [("user", query.input)]}
     result = await agent.ainvoke(inputs)
     raw_content = result["messages"][-1].content
-    return extract_json(raw_content)
+    json_data = extract_json(raw_content)
+    validated_data = MovieListResponse(**json_data)
+    return validated_data.model_dump()
   except Exception as e:
     logger.error(f"실행 중 에러: {str(e)}")
     raise HTTPException(
