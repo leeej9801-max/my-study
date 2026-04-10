@@ -90,21 +90,23 @@ async def save_movie_db(imdb_id: str) -> str:
     영화 상세 정보를 db에 저장하는 도구
     """
     try:
+        # 1. API 호출 (이 부분은 기존 httpx 비동기를 유지해도 문제없습니다)
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 settings.movie_api_url,
                 params={"i": imdb_id, "apikey": settings.movie_api_key, "plot": "full"}
             )
             data = response.json()
+            
         if data.get("Response") != "True":
             return json.dumps({"status": "error", "message": "영화를 찾을 수 없습니다."})
 
         # 2. PostgreSQL 연결 및 데이터 저장
-        conn_info = "dbname=esg_platform user=postgres password=esg1234 host=localhost port=5432"
+        db_info = "dbname=esg_platform user=postgres password=esg1234 host=localhost port=5432"
         
-        async with await psycopg.AsyncConnection.connect(conn_info) as conn:
-            async with conn.cursor() as cur:
-                await cur.execute(
+        with psycopg.connect(db_info) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
                     """
                     INSERT INTO movies (imdb_id, title, year, director, actors, plot, poster)
                     VALUES (%s, %s, %s, %s, %s, %s, %s)
@@ -117,7 +119,7 @@ async def save_movie_db(imdb_id: str) -> str:
                         data.get("Director"), data.get("Actors"), data.get("Plot"), data.get("Poster")
                     )
                 )
-                await conn.commit()
+                conn.commit() 
 
         return json.dumps({
             "status": "success", 
@@ -125,7 +127,7 @@ async def save_movie_db(imdb_id: str) -> str:
         }, ensure_ascii=False)
 
     except Exception as e:
-        logger.error(f"Postgres 저장 오류: {str(e)}")
+        logger.error(f"Postgres 저장 오류 (동기): {str(e)}")
         return json.dumps({"status": "error", "message": f"DB 저장 실패: {str(e)}"}, ensure_ascii=False)
 
 movie_tools = [search_movie_list, get_movie_detail, save_movie_db]
@@ -161,8 +163,10 @@ async def lifespan(app: FastAPI):
             "당신은 영화 정보 전문가입니다.\n"
             "1. 목록 검색: 'search_movie_list'\n"
             "2. 상세 정보: 'get_movie_detail'\n"
-            "3. DB 저장: 사용자가 저장을 요청하거나, 명시적인 수집 작업일 경우 'save_movie_db'를 사용하세요.\n"
-            f"응답은 반드시 지정된 JSON 스키마를 따르세요: {schema}"
+            "3. DB 저장: 'save_movie_db'를 사용하세요.\n"
+            "결과를 출력할 때는 '알겠습니다'나 '저장했습니다' 같은 설명은 절대 하지 마세요.\n" # 수다 방지 지시
+            "반드시 지정된 JSON 스키마를 따르는 순수한 JSON 객체만 딱 하나 출력하세요.\n"
+            f"응답 스키마: {schema}"
         )
         app.state.agent_executor = create_react_agent(llm, movie_tools, prompt=system_message)
         
