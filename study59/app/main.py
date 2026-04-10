@@ -8,8 +8,8 @@ def main():
   # step02.run()
   # print("Step 3 실행: 원하는 형태로 결과 만들기 - 구조화된 출력 활용하기")
   # step03.run()
-  print("Step 4 실행: 문법 교정과 번역기능이 있는 챗봇 구축하기")
-  step04.run()
+  # print("Step 4 실행: 문법 교정과 번역기능이 있는 챗봇 구축하기")
+  # step04.run()
 
 if __name__ == "__main__":
   main()

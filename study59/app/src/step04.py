@@ -189,9 +189,12 @@ def run():
     graph = setup_graph()
     config = {"configurable": {"thread_id": "1"}} # 세션 아이디 설정
     
+    print(f"번역 프로그램 시작되었습니다. (종료: q, quit, exit)")
+
     while True:
       try:
         user_input = input("User: ")
+
         if user_input.lower() in ["quit", "exit", "q"]:
           print("Goodbye!")
           break
@@ -204,8 +207,8 @@ def run():
         # 마지막 respond 노드의 결과 출력
         print("Assistant:", response["messages"][-1].content)
       except Exception as e:
-          print(f"루프 내 오류: {e}")
-          break
+        print(f"루프 내 오류: {e}")
+        break
 
   except Exception as e:
       print(f"초기화 오류: {e}")
