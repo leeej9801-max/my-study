@@ -75,8 +75,8 @@ def run():
     for event in graph.stream(inputs, config, stream_mode="values"):
       if "messages" in event and event["messages"]:
         last_msg = event["messages"][-1]
-        print(f"\n[{last_msg.type.upper()}]:\n{last_msg.content}\n")
-        print("-" * 30)
+        logger.info(f"\n[{last_msg.type.upper()}]:\n{last_msg.content}\n")
+        logger.info("-" * 30)
 
   except Exception as e:
     logger.error(f"실행 중 오류 발생: {str(e)}")
