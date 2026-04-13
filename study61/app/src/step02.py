@@ -65,28 +65,31 @@ def supervisor_node(state: MessagesState) -> Command[Literal["collector", "analy
 
 # 5. 그래프 빌드 및 실행
 def run():
-  workflow = StateGraph(MessagesState)
+  try:
+    workflow = StateGraph(MessagesState)
 
-  # 노드 추가
-  workflow.add_node(SUPERVISOR, supervisor_node)
-  workflow.add_node(COLLECTOR, collector_node)
-  workflow.add_node(ANALYST, analyst_node)
+    # 노드 추가
+    workflow.add_node(SUPERVISOR, supervisor_node)
+    workflow.add_node(COLLECTOR, collector_node)
+    workflow.add_node(ANALYST, analyst_node)
 
-  # 시작점 설정: 항상 관리자가 먼저 판단
-  workflow.add_edge(START, SUPERVISOR)
+    # 시작점 설정: 항상 관리자가 먼저 판단
+    workflow.add_edge(START, SUPERVISOR)
 
-  # 체크포인트 및 컴파일
-  memory = MemorySaver()
-  graph = workflow.compile(checkpointer=memory)
-  save_graph_image(graph)
+    # 체크포인트 및 컴파일
+    memory = MemorySaver()
+    graph = workflow.compile(checkpointer=memory)
+    save_graph_image(graph)
 
-  # 실행 테스트
-  config = {"configurable": {"thread_id": "test_session_123"}}
-  inputs = {"messages": [HumanMessage(content="최신 인공지능 트렌드에 대해서 요약해줘")]}
-  for event in graph.stream(inputs,config, stream_mode="values"):
-    if "messages" in event:
-      last_msg = event["messages"][-1]
-      logger.info(f"[{last_msg.type}]: {last_msg.content[:50]}...")
+    # 실행 테스트
+    config = {"configurable": {"thread_id": "test_session_123"}}
+    inputs = {"messages": [HumanMessage(content="최신 인공지능 트렌드에 대해서 요약해줘")]}
+    for event in graph.stream(inputs, config, stream_mode="values"):
+      if "messages" in event:
+        last_msg = event["messages"][-1]
+        logger.info(f"[{last_msg.type}]: {last_msg.content[:50]}...")
+  except Exception as e:
+    logger.error(f"실행 중 오류 발생: {str(e)}")
 
 if __name__ == "__main__":
   run()
