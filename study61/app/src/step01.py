@@ -63,7 +63,6 @@ def run():
     # 체크포인트 및 컴파일
     memory = MemorySaver()
     graph = workflow.compile(checkpointer=memory)
-
     save_graph_image(graph)
 
     # 실행 설정
