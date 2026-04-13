@@ -16,6 +16,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class Query(BaseModel):
+
     input: str
 
 class MovieItem(BaseModel):
@@ -176,3 +177,60 @@ async def lifespan(app: FastAPI):
         logger.error(f"공장 초기화 중 에러 발생: {e}")
     finally:
         logger.info("공장 가동을 중단합니다.")
+  async with httpx.AsyncClient() as client:
+    try:
+      response = await client.get(
+        settings.movie_api_url,
+        params={"s": query, "apikey": settings.movie_api_key},
+        timeout=10.0
+      )
+      response.raise_for_status()
+      data = response.json()
+
+      if data.get("Response") == "True":
+        search_results = data.get("Search", [])
+        formatted_data = [
+          {
+            "imdbID": m.get("imdbID"),
+            "title": m.get("Title"),
+            "poster": m.get("Poster"),
+            "year": m.get("Year"),
+            "type": m.get("Type")
+          } for m in search_results
+        ]
+        return json.dumps(formatted_data, ensure_ascii=False)
+      else:
+        return json.dumps({"error": f"'{query}'에 대한 검색 결과가 없습니다."}, ensure_ascii=False)
+
+    except httpx.HTTPStatusError as e:
+      logger.error(f"API 요청 오류: {e.response.status_code}")
+      return json.dumps({"error": "영화 서버 응답 오류가 발생했습니다."}, ensure_ascii=False)
+    except Exception as e:
+      logger.error(f"예상치 못한 오류: {str(e)}")
+      return json.dumps({"error": "네트워크 연결이 원활하지 않습니다."}, ensure_ascii=False)
+
+tools = [search_movie_info]
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+  try:
+    llm = ChatOllama(
+      model=settings.ollama_model_name, 
+      base_url=settings.ollama_base_url, 
+      format="json",
+      temperature=0
+    )
+    schema = MovieListResponse.model_json_schema()
+    system_message = (
+      f"당신은 영화 정보 전문가입니다. 반드시 search_movie_info 도구를 사용해 정보를 찾으세요. "
+      f"응답은 반드시 다음 JSON 스키마를 따르는 순수한 JSON 객체여야 합니다: {schema}. "
+      f"설명이나 인사말 없이 JSON만 출력하세요."
+    )
+    app.state.agent_executor = create_react_agent(llm, tools, prompt=system_message)
+    
+    logger.info("Agent Session Created Successfully!")
+    yield
+  except Exception as e:
+    logger.error(f"초기화 중 오류 발생: {e}")
+  finally:
+    logger.info("Finalizing shutdown...")
