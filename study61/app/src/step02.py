@@ -81,8 +81,9 @@ def run():
   save_graph_image(graph)
 
   # 실행 테스트
+  config = {"configurable": {"thread_id": "test_session_123"}}
   inputs = {"messages": [HumanMessage(content="최신 인공지능 트렌드에 대해서 요약해줘")]}
-  for event in graph.stream(inputs, stream_mode="values"):
+  for event in graph.stream(inputs,config, stream_mode="values"):
     if "messages" in event:
       last_msg = event["messages"][-1]
       logger.info(f"[{last_msg.type}]: {last_msg.content[:50]}...")
